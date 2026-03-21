@@ -2,48 +2,59 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flip Clock</title>
-    <!-- Import Montserrat Font -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Flip Clock Screensaver</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
-<!-- Standard favicon -->
-<link rel="icon" href="favicon.ico" sizes="any">
-
-<!-- SVG favicon -->
-<link rel="icon" type="image/svg+xml" href="favicon.svg">
-
-<!-- PNG fallback -->
-<link rel="icon" type="image/png" sizes="96x96" href="favicon-96x96.png">
-
-<!-- Apple -->
-<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-
-<!-- Manifest -->
-<link rel="manifest" href="site.webmanifest">
-
     <style>
         :root {
-            --bg-color: #1a1c1e; /* Soothing Deep Slate */
-            --card-bg: #f5f2e9; /* Warm Cream - reduces blue light strain */
-            --text-color: #3c3f41; /* Muted Charcoal */
+            --bg-color: #1a1c1e;
+            --card-bg: #f5f2e9;
+            --text-color: #3c3f41;
             --flip-speed: 0.6s;
-            --border-radius: 10px;
-            --accent-color: #6b7280; /* Soft Gray for dots */
+            --border-radius: 1vw; /* Responsive radius */
+            --accent-color: #6b7280;
+            
+            /* Responsive Card Dimensions */
+            --card-width: 12vw;
+            --card-height: 18vw;
+            --font-size: 14vw;
+        }
+
+        /* Adjustments for Portrait/Mobile to ensure it fits before fullscreen */
+        @media (max-aspect-ratio: 1/1) {
+            :root {
+                --card-width: 14vw;
+                --card-height: 22vw;
+                --font-size: 16vw;
+            }
+        }
+
+        /* Large Screen Cap to prevent clock from being comically large */
+        @media (min-width: 1200px) {
+            :root {
+                --card-width: 140px;
+                --card-height: 210px;
+                --font-size: 160px;
+                --border-radius: 12px;
+            }
         }
 
         * {
             box-sizing: border-box;
             user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
             background-color: var(--bg-color);
             color: var(--text-color);
             margin: 0;
+            padding: 0 20px;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
+            width: 100vw;
             overflow: hidden;
             font-family: 'Montserrat', sans-serif;
             cursor: pointer;
@@ -52,30 +63,30 @@
 
         .clock-container {
             display: flex;
-            gap: 12px;
+            gap: 1.5vw;
             perspective: 1000px;
             align-items: center;
+            width: 100%;
+            justify-content: center;
         }
 
         .flip-group {
             display: flex;
-            gap: 6px;
+            gap: 0.8vw;
         }
 
-        /* The Card */
         .flip-card {
             position: relative;
-            width: 100px;
-            height: 150px;
+            width: var(--card-width);
+            height: var(--card-height);
             background-color: var(--card-bg);
             border-radius: var(--border-radius);
-            font-size: 110px;
+            font-size: var(--font-size);
             font-weight: 800;
             text-align: center;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            box-shadow: 0 1vw 3vw rgba(0,0,0,0.3);
         }
 
-        /* Half card shared styles */
         .up, .down, .inn {
             position: absolute;
             left: 0;
@@ -96,27 +107,11 @@
             color: var(--text-color);
         }
 
-        .up {
-            top: 0;
-            border-radius: var(--border-radius) var(--border-radius) 0 0;
-            z-index: 2;
-        }
+        .up { top: 0; border-radius: var(--border-radius) var(--border-radius) 0 0; z-index: 2; }
+        .up .inn { top: 0; }
+        .down { bottom: 0; border-radius: 0 0 var(--border-radius) var(--border-radius); z-index: 1; }
+        .down .inn { bottom: 0; }
 
-        .up .inn {
-            top: 0;
-        }
-
-        .down {
-            bottom: 0;
-            border-radius: 0 0 var(--border-radius) var(--border-radius);
-            z-index: 1;
-        }
-
-        .down .inn {
-            bottom: 0;
-        }
-
-        /* The animated folding part */
         .leaf {
             position: absolute;
             top: 0;
@@ -135,34 +130,17 @@
             left: 0;
             width: 100%;
             height: 100%;
-            -webkit-backface-visibility: hidden;
             backface-visibility: hidden;
             overflow: hidden;
             border-radius: var(--border-radius) var(--border-radius) 0 0;
         }
 
-        .leaf-front {
-            z-index: 2;
-        }
+        .leaf-front { z-index: 2; }
+        .leaf-back { transform: rotateX(-180deg); z-index: 1; }
+        .leaf-back .inn { bottom: 0; height: 200%; position: absolute; top: auto; }
 
-        .leaf-back {
-            transform: rotateX(-180deg);
-            z-index: 1;
-        }
+        .flipping .leaf { transform: rotateX(-180deg); }
 
-        .leaf-back .inn {
-            bottom: 0;
-            height: 200%;
-            position: absolute;
-            top: auto;
-        }
-
-        /* Active Flip State */
-        .flipping .leaf {
-            transform: rotateX(-180deg);
-        }
-
-        /* Horizontal Split Line - Softer contrast */
         .up::after, .leaf-front::after {
             content: '';
             position: absolute;
@@ -174,44 +152,41 @@
             z-index: 5;
         }
 
-        /* Dividers (dots) - Lowered brightness */
         .divider {
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            margin: 0 10px;
+            gap: 2vw;
+            margin: 0 1vw;
         }
 
         .dot {
-            width: 10px;
-            height: 10px;
+            width: 1.2vw;
+            height: 1.2vw;
             background-color: var(--accent-color);
             border-radius: 50%;
             opacity: 0.6;
         }
 
-        /* UI Controls */
         .controls {
             position: absolute;
-            bottom: 40px;
+            bottom: 5vh;
             display: flex;
             gap: 15px;
             opacity: 0;
             transition: opacity 0.4s ease;
+            z-index: 10;
         }
 
-        body:hover .controls {
-            opacity: 1;
-        }
+        body:hover .controls { opacity: 1; }
 
         .btn {
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
             color: #a0a0a0;
-            padding: 10px 24px;
+            padding: 12px 24px;
             border-radius: 30px;
             cursor: pointer;
-            font-size: 11px;
+            font-size: 12px;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.1em;
@@ -219,23 +194,18 @@
             backdrop-filter: blur(10px);
         }
 
-        .btn:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: #ffffff;
-        }
+        .btn:hover { background: rgba(255, 255, 255, 0.1); color: #ffffff; }
 
-        @media (max-width: 768px) {
-            .flip-card { width: 50px; height: 80px; font-size: 55px; }
-            .clock-container { gap: 6px; }
-            .divider { margin: 0 4px; }
-            .dot { width: 6px; height: 6px; }
+        /* Specific fix for very small mobile phones in portrait */
+        @media (max-width: 480px) and (orientation: portrait) {
+            .clock-container { gap: 1vw; }
+            .divider { margin: 0 0.5vw; }
         }
     </style>
 </head>
 <body onclick="toggleFullScreen()">
 
     <div class="clock-container">
-        <!-- Hours -->
         <div class="flip-group">
             <div class="flip-card" id="hour-tens">
                 <div class="up"><div class="inn">0</div></div>
@@ -260,7 +230,6 @@
             <div class="dot"></div>
         </div>
 
-        <!-- Minutes -->
         <div class="flip-group">
             <div class="flip-card" id="min-tens">
                 <div class="up"><div class="inn">0</div></div>
@@ -285,7 +254,6 @@
             <div class="dot"></div>
         </div>
 
-        <!-- Seconds -->
         <div class="flip-group">
             <div class="flip-card" id="sec-tens">
                 <div class="up"><div class="inn">0</div></div>
@@ -324,21 +292,18 @@
             const currentValue = downInn.innerText;
             
             if (newValue !== currentValue) {
-                // Prepare flip
                 leafFrontInn.innerText = currentValue;
                 leafBackInn.innerText = newValue;
                 upInn.innerText = newValue;
                 
                 card.classList.remove('flipping');
-                void card.offsetWidth; // Force reflow
+                void card.offsetWidth; 
                 card.classList.add('flipping');
                 
-                // Sync bottom half halfway through animation
                 setTimeout(() => {
                     downInn.innerText = newValue;
                 }, 300);
 
-                // Cleanup
                 setTimeout(() => {
                     card.classList.remove('flipping');
                     leafFrontInn.innerText = newValue;
@@ -368,18 +333,30 @@
             updateClock();
         }
 
-        function toggleFullScreen() {
+        async function toggleFullScreen() {
             if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen().catch(() => {});
+                try {
+                    await document.documentElement.requestFullscreen();
+                    // Lock to landscape if supported (Mobile Chrome/Android)
+                    if (screen.orientation && screen.orientation.lock) {
+                        await screen.orientation.lock('landscape').catch(e => console.log("Orientation lock not supported"));
+                    }
+                } catch (err) {
+                    console.log("Fullscreen request failed");
+                }
             } else {
-                document.exitFullscreen();
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                    // Unlock orientation when exiting
+                    if (screen.orientation && screen.orientation.unlock) {
+                        screen.orientation.unlock();
+                    }
+                }
             }
         }
 
-        // Initialize display immediately
         updateClock();
         setInterval(updateClock, 1000);
     </script>
 </body>
-
 </html>
