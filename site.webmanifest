@@ -1,6 +1,6 @@
 {
-  "name": "MyWebSite",
-  "short_name": "MySite",
+  "name": "Flip Clock Pro",
+  "short_name": "FlipClock",
   "icons": [
     {
       "src": "/web-app-manifest-192x192.png",
@@ -15,7 +15,9 @@
       "purpose": "maskable"
     }
   ],
-  "theme_color": "#ffffff",
-  "background_color": "#ffffff",
-  "display": "standalone"
+  "theme_color": "#1a1c1e",
+  "background_color": "#1a1c1e",
+  "display": "standalone",
+  "start_url": "./index.html",
+  "orientation": "landscape-primary"
 }
